@@ -1,0 +1,14 @@
+{
+  "name": "folio-web",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Browser-based document editor and question bank",
+  "scripts": {
+    "test": "node --test tests/test_core.cjs tests/check_site.cjs tests/test_i18n.cjs",
+    "test:import": "node tests/test_wasm.cjs",
+    "check": "npm test && npm run test:import"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}

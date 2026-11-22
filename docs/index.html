@@ -1,0 +1,337 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Folio Web 1.0 · Documentos y exámenes</title>
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#245b9a">
+<link rel="icon" href="folio-icon.png" type="image/png">
+<link rel="stylesheet" href="style.css">
+
+</head>
+<body>
+<a class="skip-link" href="#editorView">Saltar al editor</a>
+<header class="top"><div class="branding">
+<span class="logo"><img src="folio-icon.png" alt="Folio" width="30" height="30"></span><div>
+<strong>folio<span class="dot">.</span></strong><small>WEB · 1.0</small>
+</div>
+</div>
+<div class="docname">
+<input id="title" aria-label="Nombre del documento" value="Documento sin título"><span id="saveState" role="status" aria-live="polite">Guardando…</span>
+</div>
+<div class="top-actions">
+<button id="newDoc" class="ghost">＋ Nuevo</button><button id="saveDoc" class="outline">Guardar</button><button id="preview" class="outline">Ver páginas</button><button id="download" class="primary">Imprimir / PDF</button>
+</div>
+<div class="language-control">
+  <label for="languageSwitch" class="sr-only">Idioma / Language</label>
+  <select id="languageSwitch" aria-label="Idioma / Language" title="Idioma / Language">
+    <option value="es">ES · Español</option>
+    <option value="en">EN · English</option>
+  </select>
+</div>
+</header>
+<div class="privacy-banner" id="privacyBanner">
+<span>Folio Web funciona <strong>sin cuentas ni servidores</strong>. Tus documentos y preguntas se guardan únicamente en este navegador.</span><button id="dismissBanner" type="button" aria-label="Ocultar aviso">×</button>
+</div>
+<div class="shell">
+<aside class="sidebar"><div class="navlabel">ESPACIO DE TRABAJO</div>
+<button class="nav active" data-view="editor"><span>▤</span> Editor de documentos</button><button class="nav" data-view="bank"><span>▦</span> Banco de preguntas <b id="bankCount">0</b></button><button class="nav" data-view="exam"><span>☷</span> Crear examen</button><button type="button" id="mobileDocsToggle" class="mobile-docs-toggle" aria-expanded="false" aria-controls="docList">Mis documentos <span aria-hidden="true">⌄</span></button><div class="navlabel second docs-heading">
+<span>MIS DOCUMENTOS</span><span id="docCount" class="doc-count" aria-live="polite">0</span>
+</div>
+<div class="doc-controls">
+<div class="doc-search">
+<svg viewbox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5"></circle><path d="m15.5 15.5 5 5"></path></svg><input id="docSearch" type="search" placeholder="Buscar documentos…" autocomplete="off" spellcheck="false" aria-label="Buscar documentos por nombre o nombre de archivo"><kbd title="Atajo: Ctrl + Mayús + F">⌃⇧F</kbd>
+</div>
+<label class="doc-sort-label" for="docSort">Ordenar por<select id="docSort" aria-label="Ordenar mis documentos"><option value="recent">Últimos utilizados</option>
+<option value="modified">Últimos modificados</option>
+<option value="name">Nombre (A–Z)</option></select></label>
+</div>
+<div id="docList" class="doclist" role="list" aria-label="Mis documentos"></div>
+<div id="docListFooter" class="doc-list-footer" aria-live="polite"></div>
+<div class="sidebottom">
+<span class="status-dot"></span> Guardado privado <small>IndexedDB de este navegador; exporta copias periódicas.</small><button id="backup" class="textbtn">Exportar espacio completo (.json)</button><button id="restore" class="textbtn">Importar copia</button><button id="backupHistory" class="textbtn">Historial local</button><button id="quit" class="textbtn">Acerca de Folio Web</button>
+</div></aside>
+<main class="main"><section id="editorView" class="view" tabindex="-1"><div class="ribbon">
+<div class="tabs">
+<button class="tab active" data-tab="home">Inicio</button><button class="tab" data-tab="insert">Insertar</button><button class="tab" data-tab="layout">Diseño de página</button><button class="tab" data-tab="file">Archivo</button>
+</div>
+<div class="tools" id="homeTools">
+<div class="group">
+<div class="toolrow">
+<button data-cmd="undo" title="Deshacer">↶</button><button data-cmd="redo" title="Rehacer">↷</button>
+</div>
+<small>Historial</small>
+</div>
+<div class="group">
+<div class="toolrow">
+<select id="font" aria-label="Fuente"><option value="Aptos">Aptos</option>
+<option value="Calibri">Calibri</option>
+<option value="Arial">Arial</option>
+<option value="Arial Narrow">Arial Narrow</option>
+<option value="Segoe UI">Segoe UI</option>
+<option value="Verdana">Verdana</option>
+<option value="Tahoma">Tahoma</option>
+<option value="Trebuchet MS">Trebuchet MS</option>
+<option value="Century Gothic">Century Gothic</option>
+<option value="Times New Roman">Times New Roman</option>
+<option value="Georgia" selected>Georgia</option>
+<option value="Cambria">Cambria</option>
+<option value="Garamond">Garamond</option>
+<option value="Palatino Linotype">Palatino Linotype</option>
+<option value="Book Antiqua">Book Antiqua</option>
+<option value="Constantia">Constantia</option>
+<option value="Courier New">Courier New</option>
+<option value="Consolas">Consolas</option>
+<option value="Lucida Console">Lucida Console</option>
+<option value="Comic Sans MS">Comic Sans MS</option></select><select id="fontSize" aria-label="Tamaño de texto"><option>8</option>
+<option>10</option>
+<option selected>12</option>
+<option>14</option>
+<option>16</option>
+<option>18</option>
+<option>24</option>
+<option>32</option>
+<option>48</option></select>
+</div>
+<div class="toolrow">
+<button data-cmd="bold" title="Negrita"><b>N</b></button><button data-cmd="italic" title="Cursiva"><i>K</i></button><button data-cmd="underline" title="Subrayado"><u>S</u></button><button data-cmd="strikeThrough" title="Tachado"><s>abc</s></button><button data-cmd="superscript" title="Superíndice">x²</button><button data-cmd="subscript" title="Subíndice">x₂</button><label class="color" title="Color de texto">A<input type="color" id="textColor" value="#244f88"></label><label class="color highlight" title="Resaltar">▰<input type="color" id="highlight" value="#fff1a6"></label><button data-cmd="removeFormat" title="Borrar formato">Tx</button>
+</div>
+<small>Fuente</small>
+</div>
+<div class="group">
+<div class="toolrow">
+<button data-cmd="justifyLeft" title="Alinear a la izquierda">☰</button><button data-cmd="justifyCenter" title="Centrar">≡</button><button data-cmd="justifyRight" title="Alinear a la derecha">☷</button><button data-cmd="justifyFull" title="Justificar">▤</button>
+</div>
+<div class="toolrow">
+<button data-cmd="insertUnorderedList" title="Viñetas">•≡</button><button data-cmd="insertOrderedList" title="Numeración">1≡</button><button id="listIndent" title="Crear subviñeta · Tab" aria-label="Aumentar nivel">⇥</button><button id="listOutdent" title="Subir nivel · Mayús+Tab" aria-label="Reducir nivel">⇤</button>
+</div>
+<div class="toolrow list-editor">
+<label for="bulletStyle">Viñeta <select id="bulletStyle" aria-label="Estilo de viñeta"><option value="disc">• Punto</option>
+<option value="circle">◦ Círculo</option>
+<option value="square">▪ Cuadrado</option>
+<option value="dash">– Guion</option>
+<option value="arrow">→ Flecha</option>
+<option value="check">✓ Check</option>
+<option value="star">★ Estrella</option>
+<option value="diamond">◆ Rombo</option>
+<option value="decimal">1, 2, 3</option>
+<option value="lower-alpha">a, b, c</option>
+<option value="upper-alpha">A, B, C</option>
+<option value="lower-roman">i, ii, iii</option>
+<option value="upper-roman">I, II, III</option>
+<option value="custom">✎ Personalizada</option></select></label><label id="customBulletWrap" class="hidden" for="customBullet">Símbolo <input id="customBullet" maxlength="3" value="➤" title="Símbolo personalizado" aria-label="Símbolo personalizado"></label>
+</div>
+<small>Listas y subniveles</small>
+</div>
+<div class="group">
+<select id="blockStyle" aria-label="Estilo de párrafo"><option value="p">Texto normal</option>
+<option value="h1">Título 1</option>
+<option value="h2">Título 2</option>
+<option value="h3">Título 3</option>
+<option value="blockquote">Cita</option></select><small>Estilos</small>
+</div>
+</div>
+<div class="tools hidden" id="insertTools"><div class="group wide">
+<div class="toolrow">
+<button id="addTable">▦ Tabla</button><button id="addImage">▧ Imagen</button><button id="addEquation" title="Insertar una ecuación matemática visual">∑ Ecuación</button><button id="pagePreview" title="Ver las páginas A4 antes de imprimir">▤ Ver páginas</button><button id="pageBreak">↵ Salto de página</button><button id="rule">― Línea horizontal</button><button id="insertQuestion">＋ Pregunta del banco</button>
+</div>
+<small>Elementos del documento</small>
+</div></div>
+<div class="tools hidden" id="layoutTools">
+<div class="group">
+<label>Papel <select id="paper"><option value="a4">A4</option>
+<option value="letter">Carta</option></select></label><label>Orientación <select id="orientation"><option value="portrait">Vertical</option>
+<option value="landscape">Horizontal</option></select></label>
+</div>
+<div class="group">
+<label>Márgenes <select id="margin"><option value="1.5">Estrechos · 1,5 cm</option>
+<option value="2.5">Normales · 2,5 cm</option>
+<option value="3.5">Amplios · 3,5 cm</option></select></label><label>Interlineado <select id="spacing"><option value="1">Sencillo</option>
+<option value="1.15">1,15</option>
+<option value="1.5">1,5</option>
+<option value="2">Doble</option></select></label>
+</div>
+<div class="group">
+<label>Fuente base <select id="baseFont"><option value="serif">Serif</option>
+<option value="sans">Sans serif</option>
+<option value="mono">Monoespaciada</option>
+<option value="Arial">Arial</option>
+<option value="Calibri">Calibri</option>
+<option value="Aptos">Aptos</option>
+<option value="Segoe UI">Segoe UI</option>
+<option value="Verdana">Verdana</option>
+<option value="Tahoma">Tahoma</option>
+<option value="Times New Roman">Times New Roman</option>
+<option value="Georgia">Georgia</option>
+<option value="Cambria">Cambria</option>
+<option value="Garamond">Garamond</option>
+<option value="Palatino Linotype">Palatino Linotype</option>
+<option value="Consolas">Consolas</option>
+<option value="Courier New">Courier New</option></select></label><label>Tamaño base <select id="baseSize"><option>10</option>
+<option>11</option>
+<option>12</option>
+<option>14</option></select></label>
+</div>
+<div class="group"><label class="check"><input type="checkbox" id="pageNumbers"> Numerar páginas</label></div>
+</div>
+<div class="tools hidden" id="fileTools"><div class="group wide">
+<div class="toolrow">
+<button id="openDoc">Importar documento</button><button id="saveAs">Guardar archivo como…</button><button id="duplicate">Duplicar documento</button><button id="rename">Cambiar nombre</button><button id="deleteDoc" class="danger">Eliminar documento</button><button id="printDoc">Imprimir / PDF</button><button id="exportSource">Exportar LaTeX (.zip)</button>
+</div>
+<small>Gestionar archivo</small>
+</div></div>
+</div>
+<div class="document-tabs" id="documentTabs" role="tablist"></div>
+<div class="canvas" id="canvas">
+<div class="ruler">
+<span>0</span><span>2</span><span>4</span><span>6</span><span>8</span><span>10</span><span>12</span><span>14</span><span>16</span>
+</div>
+<article id="paperSheet" class="paper"><div id="editor" contenteditable="true" spellcheck="true" lang="es" role="textbox" aria-label="Contenido del documento" aria-multiline="true"></div></article>
+</div>
+<div class="statusbar">
+<span id="wordCount">0 palabras</span><span id="pageIndicator">Vista continua · A4</span><span><span id="engineState">IndexedDB local</span></span><div class="zoom">
+<button id="zoomOut">−</button><span id="zoomLevel">100%</span><button id="zoomIn">＋</button>
+</div>
+</div></section>
+<section id="bankView" class="view hidden contentview"><div class="eyebrow">RECURSOS DOCENTES</div>
+<div class="sectionhead">
+<div>
+<h1>Banco de preguntas</h1>
+<p>Organiza, reutiliza y combina preguntas para tus exámenes.</p>
+</div>
+<button class="primary" id="newQuestion">＋ Nueva pregunta</button>
+</div>
+<div class="metrics">
+<div>
+<small>Preguntas</small><strong id="statQuestions">0</strong>
+</div>
+<div>
+<small>Temas</small><strong id="statTopics">0</strong>
+</div>
+<div>
+<small>Dificultad alta</small><strong id="statHard">0</strong>
+</div>
+</div>
+<div class="bankpanel">
+<div class="filters">
+<input id="search" placeholder="Buscar en el banco…" aria-label="Buscar preguntas"><select id="topicFilter"><option value="">Todos los temas</option></select><select id="difficultyFilter"><option value="">Todas las dificultades</option>
+<option value="Fácil">Fácil</option>
+<option value="Media">Media</option>
+<option value="Difícil">Difícil</option></select><button id="importBank" class="outline">Importar banco</button><button id="exportBank" class="outline">Exportar</button>
+</div>
+<div id="questions"></div>
+</div></section>
+<section id="examView" class="view hidden contentview"><div class="eyebrow">DISEÑO DE EVALUACIONES</div>
+<div class="sectionhead"><div>
+<h1>Crear examen</h1>
+<p>Genera una selección del banco y termina de editarla como un documento normal.</p>
+</div></div>
+<div class="examgrid">
+<div class="panel">
+<h2>1. Datos del examen</h2>
+<label>Título<input id="examTitle" value="Examen tipo test"></label><label>Subtítulo / asignatura<input id="examSubject" placeholder="Economía · Convocatoria ordinaria"></label><label>Instrucciones<textarea id="examInstructions" rows="3">Seleccione una única respuesta correcta por pregunta.</textarea></label><label class="check"><input type="checkbox" id="examIdentity" checked> Incluir nombre y fecha del estudiante</label><div class="line"></div>
+<h2>2. Selección de preguntas</h2>
+<div class="fieldrow">
+<label>Número de preguntas<input id="examN" type="number" min="1" max="500" value="10"></label><label>Dificultad<select id="examDifficulty"><option value="">Todas</option>
+<option value="Fácil">Fácil</option>
+<option value="Media">Media</option>
+<option value="Difícil">Difícil</option></select></label>
+</div>
+<label>Distribución por tema<select id="distribution"><option value="random">Aleatoria (todos los temas)</option>
+<option value="weighted">Por porcentajes</option></select></label><div id="weights" class="hidden"></div>
+<div class="line"></div>
+<h2>3. Variantes y soluciones</h2>
+<label class="check"><input type="checkbox" id="shuffleQ" checked> Mezclar preguntas</label><label class="check"><input type="checkbox" id="shuffleA" checked> Mezclar respuestas</label><label class="check"><input type="checkbox" id="answerKey" checked> Generar solucionario como documento separado</label>
+</div>
+<div class="panel exam-summary">
+<div class="exam-art">☷</div>
+<h2>Resumen del examen</h2>
+<p id="examAvailability">0 preguntas disponibles.</p>
+<div id="examDetails"></div>
+<button id="generateExam" class="primary full">Generar y abrir en el editor</button><small>La respuesta correcta se conserva al mezclar las opciones. Si después editas las respuestas o cambias su orden, revisa el solucionario.</small>
+</div>
+</div></section></main>
+</div>
+<dialog id="mathDialog" class="mathdialog"><div class="dialoghead">
+<h2>Editor visual de ecuaciones</h2>
+<button class="close" data-close="mathDialog">×</button>
+</div>
+<p class="mathhelp">Elige una estructura y cambia sus valores. Puedes combinar fracciones, raíces, potencias, sumatorios y símbolos.</p>
+<div class="math-templates">
+<button type="button" data-math="\frac{a}{b}">Fracción</button><button type="button" data-math="\sqrt{x}">Raíz</button><button type="button" data-math="x^{2}">Potencia</button><button type="button" data-math="x_{i}">Subíndice</button><button type="button" data-math="\sum_{i=1}^{n} x_{i}">Sumatorio</button><button type="button" data-math="\int_{0}^{1} f(x)">Integral</button><button type="button" data-math="\alpha+\beta=\pi">Símbolos</button>
+</div>
+<label>Expresión matemática (sintaxis guiada)<textarea id="mathInput" rows="3" spellcheck="false" placeholder="\frac{a+b}{c}"></textarea></label><div id="mathError" class="math-error" role="status"></div>
+<div id="mathPreview" class="math-preview" aria-label="Vista previa de la ecuación"></div>
+<div class="dialogfoot">
+<button class="outline" data-close="mathDialog">Cancelar</button><button class="primary" id="mathApply">Insertar ecuación</button>
+</div></dialog>
+<dialog id="pagesDialog" class="pagesdialog"><div class="dialoghead">
+<div>
+<h2>Vista paginada · A4 / Carta</h2>
+<small>Vista de lectura: el texto se edita en el documento original.</small>
+</div>
+<button class="close" data-close="pagesDialog">×</button>
+</div>
+<div class="pages-toolbar">
+<span id="pagesSummary">Preparando páginas…</span><button class="outline" id="pagesPrint">Imprimir / Guardar como PDF</button>
+</div>
+<div class="pages-scroll"><div id="pagesContent" class="pages-content"></div></div></dialog>
+<dialog id="questionDialog"><form id="questionForm">
+<div class="dialoghead">
+<h2 id="questionHeading">Nueva pregunta</h2>
+<button type="button" class="close" data-close="questionDialog">×</button>
+</div>
+<label>Enunciado<textarea id="qText" rows="3" required></textarea></label><div class="fieldrow">
+<label>Tema<input id="qTopic" required placeholder="Microeconomía" list="topicList"><datalist id="topicList"></datalist></label><label>Dificultad<select id="qDifficulty"><option value="Fácil">Fácil</option>
+<option selected value="Media">Media</option>
+<option value="Difícil">Difícil</option></select></label>
+</div>
+<div class="answerlabel">Respuestas <small>Marca la correcta</small>
+</div>
+<div id="qOptions"></div>
+<button type="button" id="addOption" class="textbtn">＋ Añadir respuesta</button><label>Explicación (opcional)<textarea id="qExplanation" rows="2"></textarea></label><div class="dialogfoot">
+<button type="button" class="outline" data-close="questionDialog">Cancelar</button><button class="primary" type="submit">Guardar pregunta</button>
+</div>
+</form></dialog>
+<dialog id="pdfDialog" class="pdfdialog"><div class="dialoghead">
+<h2>Vista previa del PDF</h2>
+<button class="close" data-close="pdfDialog">×</button>
+</div>
+<div id="pdfContent" class="pdfcontent"></div>
+<div class="dialogfoot"><button id="pdfSave" class="primary" disabled>↓ Descargar PDF</button></div></dialog>
+<dialog id="pickDialog"><div class="dialoghead">
+<h2>Insertar pregunta</h2>
+<button class="close" data-close="pickDialog">×</button>
+</div>
+<div id="pickList"></div></dialog>
+<dialog id="recoveryDialog" class="recovery-dialog"><div class="dialoghead">
+<h2>Historial de recuperación</h2>
+<button id="closeRecovery" class="close" aria-label="Cerrar">×</button>
+</div>
+<p id="backupStatus">Copias automáticas de documentos y preguntas.</p>
+<button id="createRecovery" class="outline">＋ Crear punto de recuperación</button><div id="backupItems" class="backup-items"></div>
+<p class="recovery-note">Las copias se guardan únicamente en este navegador. Exporta un JSON para tener una copia independiente; borrar los datos del sitio elimina las copias locales.</p></dialog><input type="file" id="fileDoc" accept=".folio,.html,.htm,.txt" hidden><input type="file" id="fileImage" accept="image/png,image/jpeg" hidden><input type="file" id="fileBank" accept=".json,.pdf,.docx,.txt,.csv,.html,.htm" hidden><input type="file" id="fileBackup" accept="application/json,.json" hidden><div id="toast" role="status"></div>
+<dialog id="importDialog" class="import-dialog"><div class="dialoghead">
+<h2>Revisar preguntas importadas</h2>
+<button class="close" data-close="importDialog">×</button>
+</div>
+<div id="importSummary"></div>
+<div class="import-defaults">
+<div class="fieldrow">
+<label>Tema para asignación masiva<input id="importTopic" value="Importado" list="topicList"></label><label>Dificultad para asignación masiva<select id="importDifficulty"><option value="Fácil">Fácil</option>
+<option selected value="Media">Media</option>
+<option value="Difícil">Difícil</option></select></label>
+</div>
+<button type="button" class="outline" id="importApplyAll">Aplicar tema y dificultad a todas</button><p class="import-hint">También puedes asignar un tema y una dificultad diferentes a cada pregunta. Los cambios se conservan al navegar entre páginas. La asignación masiva sustituye los valores individuales.</p>
+</div>
+<div id="importPager" class="import-pager">
+<button class="outline" id="importPrevious">← Anteriores</button><span id="importPageState">Preguntas 1–40</span><button class="outline" id="importNext">Siguientes →</button>
+</div>
+<div id="importList"></div>
+<div class="dialogfoot">
+<button class="outline" data-close="importDialog">Cancelar</button><button class="primary" id="importConfirm">Importar confirmadas</button>
+</div></dialog><script src="vendor/jszip.min.js"></script><script src="i18n.js"></script><script src="browser-store.js"></script><script src="browser-import.js"></script><script src="import.js"></script><script src="math.js"></script><script src="pages.js"></script><script src="latex.js"></script><script src="lists.js"></script><script src="web-init.js"></script><script src="document-catalog.js"></script><script src="exam-planner.js"></script><script src="app.js"></script>
+</body>
+</html>
+
